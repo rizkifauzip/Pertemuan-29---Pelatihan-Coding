@@ -1,13 +1,17 @@
 const express = require("express");
 const app = express();
+const path = require('path');
 const port = 3004;
 const expressLayouts = require("express-ejs-layouts");
 
-
+//menggunakan ejs
 app.set("view engine" , "ejs");
 
 //express layouts
 app.use(expressLayouts);
+
+//menggunakan express static
+app.use(express.static(path.join(__dirname, 'public')))
 
 app.get ('/', (req,res) => {
     res.render('index',{
