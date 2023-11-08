@@ -1,16 +1,7 @@
-<%- include('layout/header') %>
-<%- include('layout/navbar') %>
-
-   <h1 align="center"> KONTAK </h1>
-    <br />
-    <main>
-      <br />
-      <h1 align ="center" class="container mx-auto px-4 lg:max-w-7xl py-24 text-center">
-        
+<h1 align ="center" class="container mx-auto px-4 lg:max-w-7xl py-24 text-center">        
       Daftar Nama dan Kontak
-    </h1>
-    <br />
- 
+  </h1>
+
     <% if (isEmpty) { %>
     <h2 align= "center" class="container mx-auto px-4 lg:max-w-7xl py-24 text-center" >
       <font color="red"> Kontak Kosong!!</font>
@@ -24,5 +15,4 @@
       <% }); %>
     </ul>
     <% } %>
-    </main>
-    <%- include('layout/footer') %>
+    

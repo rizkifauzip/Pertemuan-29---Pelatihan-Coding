@@ -1,14 +1,23 @@
 const express = require("express");
 const app = express();
 const port = 3004;
+const expressLayouts = require("express-ejs-layouts");
+
 
 app.set("view engine" , "ejs");
 
+//express layouts
+app.use(expressLayouts);
+
 app.get ('/', (req,res) => {
-    res.render('index')
+    res.render('index',{
+      layout :"layout/core-layout",
+    });
 });
 app.get ('/about', (req,res) => {
-  res.render('about',{nama:"rizki fauzi"})
+  res.render('about', {
+  layout :"layout/core-layout",
+  });
 });
 
 app.get ('/contact', (req,res) => {
@@ -21,11 +30,13 @@ app.get ('/contact', (req,res) => {
         res.render("contact", {
           contact,
           isEmpty: true, 
+          layout :"layout/core-layout",
         });
       } else {
         res.render("contact", {
           contact,
           isEmpty: false, 
+          layout :"layout/core-layout",
         });
       }
 });
