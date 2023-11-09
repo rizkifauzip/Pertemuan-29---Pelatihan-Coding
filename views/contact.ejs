@@ -1,18 +1,33 @@
-<h1 align ="center" class="container mx-auto px-4 lg:max-w-7xl py-24 text-center">        
-      Daftar Nama dan Kontak
+<h1 align ="center" class="container mx-auto px-4 lg:max-w-7xl py-24 text-center">
+  <font color="white"> DAFTAR NAMA KONTAK </font>        
   </h1>
+  <!-- membuat tabel daftar kontak dan email -->
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th scope="col">No</th>
+            <th scope="col">Nama</th>
+            <th scope="col">Email</th>
+          </tr>
+        </thead>
 
     <% if (isEmpty) { %>
     <h2 align= "center" class="container mx-auto px-4 lg:max-w-7xl py-24 text-center" >
       <font color="red"> Kontak Kosong!!</font>
     </h2>
     <% } else { %>
-    <ul>
-      <% contact.forEach(contact => { %>
-      <li><h2>Nama: <%= contact.nama %></h2></li>
-      <li><h2>Nomor HP: <%= contact.phone %></h2></li>
-      <br />
-      <% }); %>
+      <% contact.forEach ((contact, index) => { index++ %>
+        <tr>
+          <th scope="row"><%= index++ %></th>
+          <td><%= contact.nama %></td>
+          <td><%= contact.email %></td>
+        </tr>
+        <% }); %> <% } %>
     </ul>
-    <% } %>
+  </tbody>
+</table>
+</div>
+</div>
     
