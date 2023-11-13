@@ -17,4 +17,13 @@ const fetchContact = () => {
   return contacts;
 };
 
-module.exports = { fetchContact };
+// mencari Cari contact
+const searchContact = (nama) => {
+  const contacts = fetchContact();
+  const contact = contacts.find(
+    (contact) => contact.nama.toLowerCase() === nama.toLowerCase()
+  );
+  return contact;
+};
+
+module.exports = { fetchContact, searchContact };

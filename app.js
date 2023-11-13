@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const path = require('path');
 const port = 3004;
-const { fetchContact } = require("./utility/contacts.js");
+const { fetchContact, searchContact } = require("./utility/contacts.js");
 const expressLayouts = require("express-ejs-layouts");
 
 //menggunakan ejs
@@ -45,6 +45,17 @@ app.get ('/contact', (req,res) => {
           layout :"layout/core-layout",
         });
       }
+});
+
+app.get("/contact/:nama", (req, res) => {
+  const contact = searchContact(req.params.nama);
+
+  res.render("detail", {
+    title: "Detail Contact",
+    contact,
+    isEmpty: true,
+    layout: "layout/core-layout.ejs", 
+  });
 });
 
 app.use('/',(req,res) => {
