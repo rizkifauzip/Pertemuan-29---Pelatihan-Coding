@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const path = require('path');
 const port = 3004;
-const { fetchContact, searchContact } = require("./utility/contacts.js");
+const { fetchContact, searchContact, addContact } = require("./utility/contacts.js");
 const expressLayouts = require("express-ejs-layouts");
 
 //menggunakan ejs
@@ -10,6 +10,8 @@ app.set("view engine" , "ejs");
 
 //express layouts
 app.use(expressLayouts);
+
+app.use(express.urlencoded());
 
 //menggunakan express static
 app.use(express.static(path.join(__dirname, 'public')))
@@ -45,6 +47,18 @@ app.get ('/contact', (req,res) => {
           layout :"layout/core-layout",
         });
       }
+});
+app.get("/contact/add", (req, res) => {
+  // Merender tampilan "addcontact" dengan parameter yang ditentukan
+  res.render("addContact", {
+    title: "Add Contact",
+    layout: "layout/core-layout.ejs",
+  });
+});
+// Menghandle permintaan POST untuk endpoint "/contact"
+app.post("/contact", (req, res) => {
+  addContact(req.body); 
+  res.redirect("/contact");
 });
 
 app.get("/contact/:nama", (req, res) => {

@@ -3,6 +3,17 @@
       <div class="col-md-8 mx-auto">
         <h2 class="text-center">Detail Contact</h2>
         <br />
+        <% if (!contact) { %>
+          <div
+            class="alert alert-danger text-center shadow p-3 mb-5 bg-body rounded"
+            role="alert"
+          >
+            <h1><strong>Contacts Not Found !</strong></h1>
+            <a href="/contact" class="alert-link"
+              ><h6>Back to Contact Page </h6>
+            </a>
+          </div>
+          <% } else { %> %>
         <div class="card" style="width: 18rem">
           <div class="card-body">
             <h5 class="card-title"><%= contact.nama %></h5>
@@ -11,6 +22,7 @@
             <a href="/contact" class="card-link">Back to contact page</a>
           </div>
         </div>
+        <% } %>
       </div>
     </div>
   </div>

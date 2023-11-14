@@ -26,4 +26,14 @@ const searchContact = (nama) => {
   return contact;
 };
 
-module.exports = { fetchContact, searchContact };
+const saveContacts = (contacts  ) => {
+  fs.writeFileSync("data/contacts.json", JSON.stringify(contacts));
+};
+
+// Menambahkan data contact baru json
+const addContact = (contact) => {
+  const contacts = fetchContact();
+  contacts.push(contact);
+  saveContacts(contacts);
+};
+module.exports = { fetchContact, searchContact, addContact };

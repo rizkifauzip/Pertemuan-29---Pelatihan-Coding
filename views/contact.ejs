@@ -6,11 +6,12 @@
     <div class="col-md-8 mx-auto">
       <table class="table table-striped table-hover">
         <thead>
-          <tr>
+        <tr>
             <th scope="col">No</th>
             <th scope="col">Nama</th>
             <th scope="col">No Telp</th>
-          </tr>
+            <th scope="col">Detail Kontak</th>
+        </tr>
         </thead>
 
     <% if (isEmpty) { %>
@@ -34,6 +35,10 @@
     </ul>
   </tbody>
 </table>
+  <a
+    href="/contact/add"
+    class="btn btn-success btn-light mb-6 shadow p-8"
+    >Add New Contact</a>
 </div>
 </div>
     
