@@ -2,15 +2,15 @@ const express = require("express");
 const app = express();
 const path = require('path');
 const port = 3004;
-const { fetchContact, searchContact, addContact } = require("./utility/contacts.js");
+const { fetchContact, searchContact, addContact, duplicateCheck } = require("./utility/contacts.js");
 const expressLayouts = require("express-ejs-layouts");
+const { body, validationResult } = require("express-validator");
 
 //menggunakan ejs
 app.set("view engine" , "ejs");
 
 //express layouts
 app.use(expressLayouts);
-
 app.use(express.urlencoded());
 
 //menggunakan express static
@@ -48,18 +48,40 @@ app.get ('/contact', (req,res) => {
         });
       }
 });
+//menambahkan data
 app.get("/contact/add", (req, res) => {
-  // Merender tampilan "addcontact" dengan parameter yang ditentukan
   res.render("addContact", {
     title: "Add Contact",
     layout: "layout/core-layout.ejs",
   });
 });
-// Menghandle permintaan POST untuk endpoint "/contact"
-app.post("/contact", (req, res) => {
-  addContact(req.body); 
-  res.redirect("/contact");
-});
+
+//memvalidasi "nama" yang sama
+app.post("/contact",
+  [
+    body("nama").custom((value) => {
+      const duplicate = duplicateCheck(value);
+      if (duplicate) {
+        throw new Error("Gunakan nama yang lain, nama sudah terdaftar");
+      }
+      return true;
+    }),
+  ],
+
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.render("addContact", {
+        title: "addContact",
+        layout: "layout/core-layout.ejs",
+        errors: errors.array(),
+      });
+    } else {
+      addContact(req.body);
+      res.redirect("/contact");
+    }
+  }
+);
 
 app.get("/contact/:nama", (req, res) => {
   const contact = searchContact(req.params.nama);
