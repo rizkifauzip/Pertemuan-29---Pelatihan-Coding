@@ -1,5 +1,5 @@
 <h1 align ="center" class="container mx-auto px-4 lg:max-w-7xl py-24 text-center">
-  <font color="white"> DAFTAR NAMA KONTAK </font>        
+  <font color="black"><strong>DAFTAR NAMA KONTAK </strong> </font>        
   </h1>
   <!-- membuat tabel daftar kontak dan email -->
   <div class="row">
@@ -10,7 +10,7 @@
             <th scope="col">No</th>
             <th scope="col">Nama</th>
             <th scope="col">No Telp</th>
-            <th scope="col">Detail Kontak</th>
+            <th scope="col">Action</th>
         </tr>
         </thead>
 
@@ -29,6 +29,16 @@
               href="/contact/<%=contact.nama %>"
               class="btn btn-success badge rounded-pill"
               ><i class="bi bil-info-circle"></i>Detail</a>
+            <a
+              href="/contact/update/<%=contact.nama %>"
+              class="btn btn-warning badge rounded-pill"
+              ><i class="bi bil-info-circle"></i>Update</a>
+            <a
+              href="/contact/delete/<%=contact.nama %>"
+              class="btn btn-danger badge rounded-pill" 
+              onclick="return confirm('Delete Contact?')"
+              ><i class="bi bil-info-circle" 
+              ></i>Delete</a>
           </td>
         </tr>
         <% }); %> <% } %>

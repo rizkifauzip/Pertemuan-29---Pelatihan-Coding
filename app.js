@@ -2,9 +2,14 @@ const express = require("express");
 const app = express();
 const path = require('path');
 const port = 3004;
-const { fetchContact, searchContact, addContact, duplicateCheck } = require("./utility/contacts.js");
+const { fetchContact,  duplicateCheck, updateContact, deleteContact, searchContact, addContact } 
+      = require("./utility/contacts.js");
 const expressLayouts = require("express-ejs-layouts");
-const { body, validationResult } = require("express-validator");
+const { body, validationResult, check } = require("express-validator");
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const flash = require('connect-flash');
+
 
 //menggunakan ejs
 app.set("view engine" , "ejs");
@@ -13,20 +18,36 @@ app.set("view engine" , "ejs");
 app.use(expressLayouts);
 app.use(express.urlencoded());
 
+//menggunaan cookieParser
+app.use(cookieParser('secret'));
+app.use(session ({
+    cookie: {maxAge: 6000},
+    secret: 'secret',
+    resave: true,
+    saveUninitialized: true,
+})
+);
+
+app.use(flash());
+
 //menggunakan express static
 app.use(express.static(path.join(__dirname, 'public')))
 
+//halaman utama
 app.get ('/', (req,res) => {
     res.render('index',{
       layout :"layout/core-layout",
     });
 });
+
+//halaman about
 app.get ('/about', (req,res) => {
   res.render('about', {
   layout :"layout/core-layout",
   });
 });
 
+//halaman contact
 app.get ('/contact', (req,res) => {
   const contact = fetchContact();
     //const contact = [
@@ -48,6 +69,7 @@ app.get ('/contact', (req,res) => {
         });
       }
 });
+
 //menambahkan data
 app.get("/contact/add", (req, res) => {
   res.render("addContact", {
@@ -55,7 +77,6 @@ app.get("/contact/add", (req, res) => {
     layout: "layout/core-layout.ejs",
   });
 });
-
 //memvalidasi "nama" yang sama
 app.post("/contact",
   [
@@ -82,6 +103,65 @@ app.post("/contact",
     }
   }
 );
+// Menghapus Kontak
+app.get('/contact/delete/:nama', (req, res) => {
+  // cek kontak di dalam file json berdasarkan nama
+  const contact = fetchContact(req.params.nama);
+  // jika contact tidak ada
+  if (!contact) {
+      res.status(404);
+      res.send('Data Tidak Ada')
+  } else {
+      deleteContact(req.params.nama);
+      req.flash('msg', 'Data Contact Deleted!')
+      res.redirect('/contact');
+  }
+      
+})
+
+
+// mengubah data
+app.get('/contact/update/:nama', (req, res) => {
+  const contact = fetchContact(req.params.nama);
+
+      res.render('updateContacts', {
+      tittle: 'Form Update Data Contact',
+      layout: 'layout/core-layout',
+      contact,
+  })
+})
+
+//proses update data
+app.post('/contact/update', [
+  body('nama').custom((value, {req}) => {    
+      const duplicate = duplicateCheck(value);
+      if (value !== req.body.oldNama && duplicate) {
+          throw new Error('Nama Sudah Digunakan!'); 
+      }
+      return true;  
+  }),
+  check('email', 'Email Tidak Valid!!!').isEmail(), // validator email
+  check('phone', 'Nomor Telp Tidak Valid!!!').isMobilePhone('id-ID') // validator no telp
+], 
+
+(req, res) => {
+  const errors = validationResult(req);
+  // mengirimkan error ke form
+  if (!errors.isEmpty()) {        
+      res.render('updateContacts', {
+          tittle: 'Form Edit Data Contact',
+          layout: 'layout/core-layout',
+          errors: errors.array(),
+          contact: req.body,
+      });
+  } else {
+      updateContact(req.body)
+      req.flash('msg', 'Update Berhasil !')
+      res.redirect('/contact')
+  }
+})
+
+//halaman detail kontak
 
 app.get("/contact/:nama", (req, res) => {
   const contact = searchContact(req.params.nama);

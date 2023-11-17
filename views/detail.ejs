@@ -1,29 +1,42 @@
 <div class="container mt-3">
-    <div class="row mx-auto">
-      <div class="col-md-8 mx-auto">
-        <h2 class="text-center">Detail Contact</h2>
-        <br />
-        <% if (!contact) { %>
-          <div
-            class="alert alert-danger text-center shadow p-3 mb-5 bg-body rounded"
-            role="alert"
-          >
-            <h1><strong>Contacts Not Found !</strong></h1>
-            <a href="/contact" class="alert-link"
-              ><h6>Back to Contact Page </h6>
-            </a>
-          </div>
-          <% } else { %> %>
-        <div class="card" style="width: 18rem">
-          <div class="card-body">
-            <h5 class="card-title"><%= contact.nama %></h5>
-            <h6 class="card-subtitle mb-2 text-muted"><%= contact.phone %></h6>
-            <h6 class="card-subtitle mb-2 text-muted"><%= contact.email %></h6>
-            <a href="/contact" class="card-link">Back to contact page</a>
-          </div>
+  <div class="row mx-auto">
+    <div class="col-md-8 mx-auto">
+      <h2 class="text-center">Detail Contact</h2>
+      <br />
+      <% if (!contact) { %>
+        <div
+          class="alert alert-danger text-center shadow p-5 mb-10 bg-body rounded"
+          role="alert"
+        >
+          <br>
+          <h1><strong>Contacts Not Found !</strong></h1>
+          <a href="/contact" class="alert-link"
+            ><h6>Back to Contact Page </h6>
+          </a>
         </div>
-        <% } %>
+        <% } else { %> %>
+      <div class="card" style="width: 18rem">
+        <div class="card-body">
+          <h5 class="card-title"><%= contact.nama %></h5>
+          <h6 class="card-subtitle mb-2 text-muted"><%= contact.phone %></h6>
+          <h6 class="card-subtitle mb-2 text-muted"><%= contact.email %></h6>
+            <a
+                href="/contact/update/<%=contact.nama %>"
+                class="btn btn-warning badge rounded-pill"
+                ><i class="bi bil-info-circle"></i>Update</a>
+              <a
+                href="/contact/delete/<%=contact.nama %>"
+                class="btn btn-danger badge rounded-pill"
+                onclick="return confirm('Delete Contact?');"
+                ><i class="bi bil-info-circle"
+                ></i>Delete</a>  
+          <a 
+          href="/contact" 
+             class="btn btn-primary badge rounded-pill"
+             ><i class="bi bil-info-circle"></i>Back</a>
+        </div>
       </div>
+      <% } %>
     </div>
   </div>
-  
+</div>
