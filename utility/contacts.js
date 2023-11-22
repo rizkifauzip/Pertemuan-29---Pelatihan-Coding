@@ -1,4 +1,5 @@
 const fs = require("fs");
+const pool = require ('../db.js'); 
 
 const lokasiDirr = "./data";
 if (!fs.existsSync(lokasiDirr)) {
@@ -17,7 +18,16 @@ const loadContact = () => {
   return contacts;
 }
 
-//mencar kontak berdasarkan nama
+// mengambil data yang disimpan di db
+const getContact = async () => {
+  const connection = await pool.connect();
+  const query = `SELECT * FROM kontak`;
+  const results = await connection.query(query);
+  const contacts = results.rows;
+  return contacts;
+};
+
+//mencari kontak berdasarkan nama
 const fetchContact = () => {
   //Membaca file JSON
   const file = fs.readFileSync(dataPath, "utf8");
@@ -27,7 +37,7 @@ const fetchContact = () => {
 
 // mencari Cari contact
 const searchContact = (nama) => {
-  const contacts = fetchContact();
+  const contacts = getContact();
   const contact = contacts.find(
     (contact) => contact.nama.toLowerCase() === nama.toLowerCase()
   );
@@ -41,19 +51,19 @@ const saveContacts = (contacts) => {
 
 // Menambahkan data contact baru json
 const addContact = (contact) => {
-  const contacts = fetchContact();
+  const contacts = getContact();
   contacts.push(contact);
   saveContacts(contacts);
 };
 // cek duplikat nama
 const duplicateCheck = (nama) => {
-  const contacts = loadContact();
+  const contacts = getContact();
   return contacts.find((contact) => contact.nama === nama);
 }
 
 // delete contact
 const deleteContact = (nama) => {
-  const contacts = loadContact();
+  const contacts = getContact();
   const filterContacts = contacts.filter(
       (contact) => contact.nama !== nama
   );
@@ -62,7 +72,7 @@ const deleteContact = (nama) => {
 
 // update contact
 const updateContact = (newContacts) => {
-  const contacts = loadContact();
+  const contacts = getContact();
   // menghilangkan data contact lama yang namanya sama dengan oldname
   const filterContacts = contacts.filter(
       (contact) => contact.nama !== newContacts.oldNama);
@@ -70,4 +80,4 @@ const updateContact = (newContacts) => {
   filterContacts.push(newContacts);
   saveContacts(filterContacts);
 }
-module.exports = { fetchContact, searchContact, addContact, updateContact, deleteContact, duplicateCheck };
+module.exports = { getContact, addContact, updateContact, deleteContact, duplicateCheck };

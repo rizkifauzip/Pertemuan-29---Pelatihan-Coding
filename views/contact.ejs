@@ -1,54 +1,52 @@
-<h1 align ="center" class="container mx-auto px-4 lg:max-w-7xl py-24 text-center">
-  <font color="black"><strong>DAFTAR NAMA KONTAK </strong> </font>        
-  </h1>
-  <!-- membuat tabel daftar kontak dan email -->
-  <div class="row">
-    <div class="col-md-8 mx-auto">
-      <table class="table table-striped table-hover">
-        <thead>
-        <tr>
-            <th scope="col">No</th>
-            <th scope="col">Nama</th>
-            <th scope="col">No Telp</th>
-            <th scope="col">Action</th>
-        </tr>
-        </thead>
+<div class="container">
+  <div class="contact-list" style="margin-top: 30px">
+    <h2 style="text-align: left">Daftar Kontak</h2>
+    
+    <!-- menampilkan pesan message dari flash -->
+    <% if (msg.length !== 0) { %>
+    <div class="alert alert-success" role="alert"><%= msg %></div>
+    <% } %>
 
-    <% if (isEmpty) { %>
-    <h2 align= "center" class="container mx-auto px-4 lg:max-w-7xl py-24 text-center" >
-      <font color="red"> Kontak Kosong!!</font>
-    </h2>
-    <% } else { %>
-      <% contact.forEach ((contact, index) => { index++ %>
+    <!-- Kondisi jika data contact kosong, maka akan tampil pesan data tidak tersedia -->
+    <% if (contacts.length === 0) { %>
+    <div class="alert alert-warning" role="alert">Data tidak tersedia</div>
+    <% } %>
+
+    <!-- Table Data Contact -->
+    <table class="table table-striped table-hover table-bordered">
+      <thead>
+        <tr>
+          <th scope="row" data-id="id">No</th>
+          <th>Nama</th>
+          <th>Nomor Telepon</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!--Melakukan perulangan untuk menampilkan data contact jika tersedia-->
+        <% contacts.forEach((contact, index) => { index++ %>
         <tr>
           <th scope="row"><%= index++ %></th>
           <td><%= contact.nama %></td>
           <td><%= contact.phone %></td>
           <td>
-            <a
-              href="/contact/<%=contact.nama %>"
-              class="btn btn-success badge rounded-pill"
-              ><i class="bi bil-info-circle"></i>Detail</a>
-            <a
-              href="/contact/update/<%=contact.nama %>"
-              class="btn btn-warning badge rounded-pill"
-              ><i class="bi bil-info-circle"></i>Update</a>
-            <a
-              href="/contact/delete/<%=contact.nama %>"
-              class="btn btn-danger badge rounded-pill" 
-              onclick="return confirm('Delete Contact?')"
-              ><i class="bi bil-info-circle" 
-              ></i>Delete</a>
+            <a href="/contact/<%= contact.nama %>" 
+              class="btn btn-success badge rounded-pill"><i 
+              class="bi bil-info-circle"></i>Detail</a>
+
+            <a href="/contact/update/<%= contact.nama %>" 
+              class="btn btn-info badge rounded-pill"><i 
+              class="bi bil-info-circle"></i>Edit</a>
+
+            <a href="/contact/delete/<%= contact.nama %>" 
+              button onclick="return confirm('Delete Contact?')" 
+              class="btn btn-danger badge rounded-pill"><i 
+              class="bi bil-info-circle"></i>Delete</a>
           </td>
         </tr>
-        <% }); %> <% } %>
-    </ul>
-  </tbody>
-</table>
-  <a
-    href="/contact/add"
-    class="btn btn-success btn-light mb-6 shadow p-8"
-    >Add New Contact</a>
+        <% }); %>
+      </tbody>
+    </table>
+    <a href="/contact/add" class="card-link btn btn-success mb-3 fw-bold" style="text-decoration: none">Tambah Data</a>
+  </div>
 </div>
-</div>
-    

@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const path = require('path');
 const port = 3004;
-const { fetchContact,  duplicateCheck, updateContact, deleteContact, searchContact, addContact } 
+const { getContact, duplicateCheck, updateContact, deleteContact, addContact } 
       = require("./utility/contacts.js");
 const expressLayouts = require("express-ejs-layouts");
 const { body, validationResult, check } = require("express-validator");
@@ -21,7 +21,7 @@ app.set("view engine" , "ejs");
 
 //express layouts
 app.use(expressLayouts);
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded());
 
 //menggunaan cookieParser
 app.use(cookieParser('secret'));
@@ -52,27 +52,27 @@ app.get ('/about', (req,res) => {
   });
 });
 
-//halaman contact
-app.get ('/contact', (req,res) => {
-  const contact = fetchContact();
-    //const contact = [
-       // {nama : "RIZKI FAUZI P", phone : "088822222"},
-        //{nama : "FAUZI PERMANA", phone : "08888222222"},
-    //]
-    if (contact.length === 0) {
-        // Menampilkan pemberitahuan jika objek contacts yang kosong
-        res.render("contact", {
-          contact,
-          isEmpty: true, 
-          layout :"layout/core-layout",
-        });
-      } else {
-        res.render("contact", {
-          contact,
-          isEmpty: false, 
-          layout :"layout/core-layout",
-        });
-      }
+// menuju halaman contact dengan menampilkan list contact pada table db
+app.get("/contact", async (req, res) => {
+  try {
+    const contactList = await pool.query("SELECT * FROM kontak");
+    const contacts = contactList.rows;
+
+    res.render("contact", {
+      title: "Page Contact",
+      layout: "layout/core-layout",
+      contacts,
+      msg: req.flash("msg"),
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.render("contact", {
+      title: "Page Contact",
+      layout: "layout/core-layout",
+      contacts: [],
+      msg: req.flash("msg"),
+    });
+  }
 });
 
 //menambahkan data
@@ -82,6 +82,7 @@ app.get("/contact/add", (req, res) => {
     layout: "layout/core-layout.ejs",
   });
 });
+
 //memvalidasi "nama" yang sama
 app.post("/contact",
   [
@@ -123,7 +124,6 @@ app.get('/contact/delete/:nama', (req, res) => {
   }
       
 })
-
 
 // mengubah data
 app.get('/contact/update/:nama', (req, res) => {
@@ -168,8 +168,12 @@ app.post('/contact/update', [
 
 //halaman detail kontak
 
-app.get("/contact/:nama", (req, res) => {
-  const contact = searchContact(req.params.nama);
+app.get("/contact/:nama", async (req, res) => {
+  const nama = req.params.nama;
+  const contacts = await getContact();
+
+  // Temukan objek contact berdasarkan nama
+  const contact = contacts.find((contact) => contact.nama === nama);
 
   res.render("detail", {
     title: "Detail Contact",
