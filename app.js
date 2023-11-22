@@ -10,13 +10,18 @@ const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const flash = require('connect-flash');
 
+//memanggil database
+const pool = require ('./db.js'); 
+
+//req body
+app.use(express.json());
 
 //menggunakan ejs
 app.set("view engine" , "ejs");
 
 //express layouts
 app.use(expressLayouts);
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true }));
 
 //menggunaan cookieParser
 app.use(cookieParser('secret'));
@@ -173,6 +178,30 @@ app.get("/contact/:nama", (req, res) => {
     layout: "layout/core-layout.ejs", 
   });
 });
+
+app.get("/addsync", async (req, res) => {
+  try {
+    const nama = "";
+    const phone = "";
+    const email = "";
+    const newCont = await pool.query(
+      `INSERT INTO kontak values ('${nama}', '${phone}', '${email}') RETURNING *`
+    );
+    res.json(newCont);
+  } catch (err) {
+    console.log(err.message)
+  }
+});
+
+app.get("/list", async (req, res) => {
+  try {
+    const contact = await pool.query(`SELECT * FROM kontak`);
+    res.json(contact.rows);
+  } catch (err) {
+    console.log(err.message);
+  }
+});
+
 
 app.use('/',(req,res) => {
         res.status(404)
