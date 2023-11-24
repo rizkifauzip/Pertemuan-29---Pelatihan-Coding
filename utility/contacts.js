@@ -35,9 +35,9 @@ const fetchContact = () => {
   return contacts;
 };
 
-// mencari Cari contact
-const searchContact = (nama) => {
-  const contacts = getContact();
+// mencari contact
+const searchContact = async (nama) => {
+  const contacts = await getContact();
   const contact = contacts.find(
     (contact) => contact.nama.toLowerCase() === nama.toLowerCase()
   );
@@ -45,39 +45,47 @@ const searchContact = (nama) => {
 };
 
 // perintah menuliskan file contacts.json dengan data baru
-const saveContacts = (contacts) => {
-  fs.writeFileSync("data/contacts.json", JSON.stringify(contacts));
-};
+//const saveContacts = (contacts) => {
+//fs.writeFileSync("data/contacts.json", JSON.stringify(contacts));
+//};
 
 // Menambahkan data contact baru json
-const addContact = (contact) => {
-  const contacts = getContact();
-  contacts.push(contact);
-  saveContacts(contacts);
+const addContact = async (contact) => {
+  const {nama, phone, email } = contact;
+  const connection = await pool.connect();
+  const query = ` INSERT INTO kontak (nama, phone, email)
+    VALUES ($1, $2, $3)`;
+  await connection.query(query, [nama, phone, email]);
 };
+
+
 // cek duplikat nama
-const duplicateCheck = (nama) => {
-  const contacts = getContact();
+const duplicateCheck = async (nama) => {
+  const contacts = await getContact();
   return contacts.find((contact) => contact.nama === nama);
 }
 
 // delete contact
-const deleteContact = (nama) => {
-  const contacts = getContact();
-  const filterContacts = contacts.filter(
-      (contact) => contact.nama !== nama
-  );
-  saveContacts(filterContacts);
-}
+const deleteContact = async (nama) => {
+  const connection = await pool.connect();
+  const query = `DELETE FROM kontak
+    WHERE nama = $1`;
+  await connection.query(query, [nama]);
+};
 
 // update contact
-const updateContact = (newContacts) => {
-  const contacts = getContact();
-  // menghilangkan data contact lama yang namanya sama dengan oldname
-  const filterContacts = contacts.filter(
-      (contact) => contact.nama !== newContacts.oldNama);
-  delete newContacts.oldNama;
-  filterContacts.push(newContacts);
-  saveContacts(filterContacts);
-}
-module.exports = { getContact, addContact, updateContact, deleteContact, duplicateCheck };
+  const updateContact = async (newContact) => {
+    const connection = await pool.connect();
+    const query = `
+      UPDATE kontak SET nama = $1, phone = $2, email = $3
+      WHERE nama = $4 RETURNING* ; `;
+
+    await connection.query(query, [
+      newContact.nama,
+      newContact.phone,
+      newContact.email,
+      newContact.namaLama,
+    ]);
+  };
+
+module.exports = { getContact, addContact, updateContact, deleteContact, duplicateCheck, searchContact };

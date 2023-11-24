@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const path = require('path');
 const port = 3004;
-const { getContact, duplicateCheck, updateContact, deleteContact, addContact } 
+const { getContact, duplicateCheck, updateContact, deleteContact, addContact, searchContact} 
       = require("./utility/contacts.js");
 const expressLayouts = require("express-ejs-layouts");
 const { body, validationResult, check } = require("express-validator");
@@ -86,16 +86,18 @@ app.get("/contact/add", (req, res) => {
 //memvalidasi "nama" yang sama
 app.post("/contact",
   [
-    body("nama").custom((value) => {
-      const duplicate = duplicateCheck(value);
+    body("nama").custom(async (value) => {
+      const duplicate = await duplicateCheck(value);
       if (duplicate) {
         throw new Error("Gunakan nama yang lain, nama sudah terdaftar");
       }
       return true;
     }),
+    check("email", "Email tidak valid").isEmail(),
+    check("phone", "Nomor Handphone tidak valid").isMobilePhone("id-ID"),
   ],
-
-  (req, res) => {
+  
+  async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       res.render("addContact", {
@@ -104,21 +106,28 @@ app.post("/contact",
         errors: errors.array(),
       });
     } else {
-      addContact(req.body);
+      try{
+      await addContact(req.body);
+      req.flash("message", "Data berhasil ditambahkan");
       res.redirect("/contact");
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send("<h1>internal server error</h1>");
     }
   }
+  }
 );
+
 // Menghapus Kontak
-app.get('/contact/delete/:nama', (req, res) => {
+app.get('/contact/delete/:nama', async (req, res) => {
   // cek kontak di dalam file json berdasarkan nama
-  const contact = fetchContact(req.params.nama);
+  const contact = await searchContact (req.params.nama);
   // jika contact tidak ada
   if (!contact) {
       res.status(404);
       res.send('Data Tidak Ada')
   } else {
-      deleteContact(req.params.nama);
+      await deleteContact(req.params.nama);
       req.flash('msg', 'Data Contact Deleted!')
       res.redirect('/contact');
   }
@@ -126,8 +135,8 @@ app.get('/contact/delete/:nama', (req, res) => {
 })
 
 // mengubah data
-app.get('/contact/update/:nama', (req, res) => {
-  const contact = fetchContact(req.params.nama);
+app.get('/contact/update/:nama', async (req, res) => {
+  const contact = await searchContact(req.params.nama);
 
       res.render('updateContacts', {
       tittle: 'Form Update Data Contact',
@@ -138,8 +147,8 @@ app.get('/contact/update/:nama', (req, res) => {
 
 //proses update data
 app.post('/contact/update', [
-  body('nama').custom((value, {req}) => {    
-      const duplicate = duplicateCheck(value);
+  body('nama').custom(async (value, {req}) => {    
+      const duplicate = await duplicateCheck (value);
       if (value !== req.body.oldNama && duplicate) {
           throw new Error('Nama Sudah Digunakan!'); 
       }
@@ -149,22 +158,27 @@ app.post('/contact/update', [
   check('phone', 'Nomor Telp Tidak Valid!!!').isMobilePhone('id-ID') // validator no telp
 ], 
 
-(req, res) => {
+async (req, res) => {
   const errors = validationResult(req);
-  // mengirimkan error ke form
-  if (!errors.isEmpty()) {        
-      res.render('updateContacts', {
-          tittle: 'Form Edit Data Contact',
-          layout: 'layout/core-layout',
-          errors: errors.array(),
-          contact: req.body,
-      });
+  if (!errors.isEmpty()) {
+    res.render("updateContacts", {
+      title: "Update Contact",
+      layout: "layout/core-layout.ejs",
+      errors: errors.array(),
+      contact: req.body,
+    });
   } else {
-      updateContact(req.body)
-      req.flash('msg', 'Update Berhasil !')
-      res.redirect('/contact')
+    try {
+      await updateContact(req.body);
+      req.flash("message", "Data berhasil diupdate");
+      res.redirect("/contact");
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send("<h1>internal server error</h1>");
+    }
   }
-})
+}
+);
 
 //halaman detail kontak
 
